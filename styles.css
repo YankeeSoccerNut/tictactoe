@@ -1,0 +1,41 @@
+/* body {
+  background-color: blue;
+};
+ */
+
+h1{
+  color:#00ff00;
+  font-size: 60px;
+}
+
+#board{
+  max-width: 640px;
+  min-width: 320px;
+  float: none;
+  margin:  auto;
+}
+
+.square{
+  background-color: #fff;
+  outline: none;
+  border:  2px solid #000;
+  width: 100px;
+  height: 100px;
+  font-size: 60px;
+}
+
+.square:hover{
+  background-color: #ff0;
+}
+#message{
+  font-size: 40px;
+  min-height: 80px;
+}
+
+.winning-square {
+  background-color:  green;
+}
+
+#reset {
+  margin-top: 10px;
+}
