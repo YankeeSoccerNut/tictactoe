@@ -1,5 +1,8 @@
-// TODO: Turns feature....1 player (against computer), 2 player1Squares
-// TODO: Give computer intelligence to try to win!!
+// TODO: Give computer more intelligence to try to win!! (plays dumb now)
+// TODO: consider choice for computer skill level -- dumb, defensive, win!
+// TODO: track game stats...player moves...squares remaining...stop turns when 0
+// TODO: score remaining squares based...by player? to allow computer to make smarter choice.  Could also be used to enable "hint" for human player
+
 
 //GLOBALS
 numPlayers = 1;
@@ -41,6 +44,8 @@ $(document).ready(run);
 function run(){
   if (squares.length == 0){  //  first time, not reset
     setupBoard(true);
+    var utterance = new SpeechSynthesisUtterance('Would you like to play a game?');
+    window.speechSynthesis.speak(utterance);
   }
 }
 
@@ -90,7 +95,7 @@ function setupBoard(initial){
     }
   winningCombos.push(winningCombo);  // bkwd diag
 
-// winningCombos is fully loaded....copy to each players potetnial Wins
+// winningCombos is fully loaded....copy to each players potential Wins
   player1.potentialWinCombos = winningCombos.slice(0,winningCombos.length);
   player2.potentialWinCombos = winningCombos.slice(0,winningCombos.length);
 
@@ -245,51 +250,21 @@ function reducePotentialWinCombos(player, squareId){
   //Take the given square and eliminate it from a player's potential win combinations.  Typically this will be called within a players turn to affect the OTHER PLAYER'S potentialWinCombos
   console.log("reducePotentialWinCombos");
   console.log(squareId);
-  console.log(player.potentialWinCombos);
+  console.log(`potentials BEFORE: ${player.potentialWinCombos}`);
 
   //find all winning combinations with this square and remove it from this players potential...the other player has claimed it!
   // potentialWinCombos is an array of arrays
 
-  // loop through at "outer level"...should return array of winCombos
-
-  var viableCombos = player.potentialWinCombos.map(function(aWinCombo, currIndex) {
-     if (aWinCombo.indexOf(squareId) == -1){  // not found, still viable!
-       return(aWinCombo);
-     }
-     console.log(`currIndex: ${currIndex}`);
+  // filter says return the item when a condition is true....doesn't have to be anything related to the item....any true will do.
+  var viableCombos = player.potentialWinCombos.filter((item) => {
+    return (item.indexOf(squareId) == -1);
   });
 
-  console.log(`viableCombos:  ${viableCombos}`);
+  // my understanding is that we have to "copy" our result to the source array to replace it....cannot just assign (becomes pass by reference)
+  player.potentialWinCombos = viableCombos.slice(0,viableCombos.length);
 
-  // $.each(player.potentialWinCombos, function() {
-  //   console.log (this);
-  //   var aWinCombo = this;
-  //
-  //   if (aWinCombo.indexOf(squareId) != -1){  // not (not found)
-  //     console.log(`Delete ${aWinCombo} because it has ${squareId}?`);
-  //     // this.reduce((p, c) => {}, initial);
-  //   }
-  // });
+  console.log(`potentials AFTER: ${player.potentialWinCombos}`);
 
-  // If above works, add a nested map to filter on selected square...and then eliminate it!
-  // $.each(player.potentialWinCombos, function() {
-  //   this.filter(() => {
-  //     if (this.contains(squareId)){
-  //       window.alert(`Delete ${this}?`);
-  //     }
-  //   });
-  // });
-
-  //
-  // var newItems = $.map(items, function(i) {
-  //   return i + 1;
-  // });
-  // // newItems is [2,3,4,5]
-  // var doubledArray = array.map(function (nested) {
-  //   return nested.map(function (element) {
-  //       return element * 2;
-  //   });
-// });
 }
 
 function computerTurn(){
