@@ -29,6 +29,7 @@ var player1 = new Player;
 var player2 = new Player;
 
 
+
 // Need to track turns!
 // Check game status each turn...
 // Declare winner when it happens
@@ -63,7 +64,7 @@ function setupBoard(initial){
   }  // end rows
 
   console.log(gameRowsHTML);
-  document.getElementById("board").innerHTML = gameRowsHTML;
+  $('#board').html(gameRowsHTML);
 
   //need to continue to build out winningCombos....need columns and diagnols
   for (let columns = 0; columns < boxSize; columns++){
@@ -94,7 +95,7 @@ function setupBoard(initial){
   player2.potentialWinCombos = winningCombos.slice(0,winningCombos.length);
 
 // array of boxSize*boxSize objects, each object is a representation of the button object.
-  squares = document.getElementsByClassName(DEFAULT_SQ_CLASS);
+  squares = $(`.${DEFAULT_SQ_CLASS}`);
 
   for (let i = 0; i < squares.length; i++){
     // we can dynamically add an event listener to each...keeps it out of the HTML
@@ -139,7 +140,7 @@ function handleSpinner(spinner){
 function resetGame(resetClicked){
 
   // Clear out the buttons in the DOM
-  document.getElementById("board").innerHTML = "";
+  $('#board').html("");
 
   // original
   // for (let i = 0; i < squares.length; i++){
@@ -147,7 +148,7 @@ function resetGame(resetClicked){
   //   squares[i].className = DEFAULT_SQ_CLASS;
   // }
   // Clear any messages too!
-  document.getElementById('message').innerHTML = "";
+  $('#message').html("");
 
   // Reset Globals
   gameWinnerCombo = [];
@@ -175,10 +176,11 @@ function resetGame(resetClicked){
 function markSquare(squareClicked){
   var tempText = squareClicked.innerHTML;
   if(squareClicked.innerHTML != OPEN_SQUARE){
-    document.getElementById('message').innerHTML = "Sorry, that square is occupied";
+    $('#message').html("Sorry, that square is occupied");
   }
   else if (whosTurn == 1){
-    document.getElementById('message').innerHTML = "";
+    $('#message').html("");
+
     squareClicked.innerHTML = "X";
     player1.squares.push(squareClicked.id);
     haveWinner = checkWin(player1.squares, "Player 1 Wins!");
@@ -194,7 +196,8 @@ function markSquare(squareClicked){
     }
   }
   else{    // Human Player 2's turn
-    document.getElementById('message').innerHTML = "";
+    $('#message').html("");
+
     squareClicked.innerHTML = "O";
     player2.squares.push(squareClicked.id);
     haveWinner = checkWin(player2.squares, "Player 2 Wins");
@@ -221,7 +224,8 @@ function checkWin(currentPlayer, winMsg){
       }
     }
     if (gameWinnerCombo.length == boxSize){   //winner winner
-      document.getElementById('message').innerHTML = winMsg;
+      $('#message').html(winMsg);
+
       return (true);
     }
     gameWinnerCombo = []; // reset for next combination check
@@ -234,13 +238,58 @@ function markWinner() {
   for (let i = 0; i < gameWinnerCombo.length; i++){
     var theTargetSquare = gameWinnerCombo[i];
     $(`#${theTargetSquare}`).addClass('winning-square');
-    // document.getElementById([theTargetSquare]).className += ' winning-square';
   }
 }
 
 function reducePotentialWinCombos(player, squareId){
+  //Take the given square and eliminate it from a player's potential win combinations.  Typically this will be called within a players turn to affect the OTHER PLAYER'S potentialWinCombos
   console.log("reducePotentialWinCombos");
   console.log(squareId);
+  console.log(player.potentialWinCombos);
+
+  //find all winning combinations with this square and remove it from this players potential...the other player has claimed it!
+  // potentialWinCombos is an array of arrays
+
+  // loop through at "outer level"...should return array of winCombos
+
+  var viableCombos = player.potentialWinCombos.map(function(aWinCombo, currIndex) {
+     if (aWinCombo.indexOf(squareId) == -1){  // not found, still viable!
+       return(aWinCombo);
+     }
+     console.log(`currIndex: ${currIndex}`);
+  });
+
+  console.log(`viableCombos:  ${viableCombos}`);
+
+  // $.each(player.potentialWinCombos, function() {
+  //   console.log (this);
+  //   var aWinCombo = this;
+  //
+  //   if (aWinCombo.indexOf(squareId) != -1){  // not (not found)
+  //     console.log(`Delete ${aWinCombo} because it has ${squareId}?`);
+  //     // this.reduce((p, c) => {}, initial);
+  //   }
+  // });
+
+  // If above works, add a nested map to filter on selected square...and then eliminate it!
+  // $.each(player.potentialWinCombos, function() {
+  //   this.filter(() => {
+  //     if (this.contains(squareId)){
+  //       window.alert(`Delete ${this}?`);
+  //     }
+  //   });
+  // });
+
+  //
+  // var newItems = $.map(items, function(i) {
+  //   return i + 1;
+  // });
+  // // newItems is [2,3,4,5]
+  // var doubledArray = array.map(function (nested) {
+  //   return nested.map(function (element) {
+  //       return element * 2;
+  //   });
+// });
 }
 
 function computerTurn(){
@@ -256,13 +305,5 @@ function computerTurn(){
   player2.squares.push(computerPick[0].id);
 
   // Update the DOM with the Computer's Pick
-  // $('#01').html('O');  This Works Explicitly....
-
-  // tempText = '#' + computerPick[0].id; // build valid target for jQuery
-
   $(`#${computerPick[0].id}`).html('O');
-
-  // Native js works!
-  // document.getElementById(computerPick[0].id).innerHTML = 'O';
-
 }
