@@ -11,6 +11,7 @@ var gameWinnerCombo = [];
 haveWinner = false;
 var whosTurn = 1;
 var squares = [];
+var gameLog = [];
 
 // player1Squares = [];
 // player2Squares = [];
@@ -179,15 +180,15 @@ function resetGame(resetClicked){
 // User clicks a button then put that player's mark on the board
 
 function markSquare(squareClicked){
-  var tempText = squareClicked.innerHTML;
+
   if(squareClicked.innerHTML != OPEN_SQUARE){
     $('#message').html("Sorry, that square is occupied");
   }
   else if (whosTurn == 1){
     $('#message').html("");
-
     squareClicked.innerHTML = "X";
     player1.squares.push(squareClicked.id);
+    gameLog.push([1,squareClicked.id]);
     haveWinner = checkWin(player1.squares, "Player 1 Wins!");
     if ((!haveWinner) && (numPlayers == 1)){
       // Eliminate potential winning combos from Player 2 that rely on this square  (Computer is Player 2)
@@ -202,15 +203,16 @@ function markSquare(squareClicked){
   }
   else{    // Human Player 2's turn
     $('#message').html("");
-
     squareClicked.innerHTML = "O";
     player2.squares.push(squareClicked.id);
+    gameLog.push([2,squareClicked.id]);
     haveWinner = checkWin(player2.squares, "Player 2 Wins");
     whosTurn = 1;
   }
 
   if (haveWinner){
     markWinner();
+    console.log(gameLog);
   }
 }
 
@@ -278,6 +280,7 @@ function computerTurn(){
 
   // Save the players move for checking against win combos...
   player2.squares.push(computerPick[0].id);
+  gameLog.push([2, computerPick[0].id]);
 
   // Update the DOM with the Computer's Pick
   $(`#${computerPick[0].id}`).html('O');
