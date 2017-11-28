@@ -15,8 +15,11 @@ var gameLog = [];
 
 // player1Squares = [];
 // player2Squares = [];
-var OPEN_SQUARE = '-';
-var DEFAULT_SQ_CLASS = "square";
+const OPEN_SQUARE = '-';
+const DEFAULT_SQ_CLASS = "square";
+const SMALL_SQ_CLASS = "sm-square";
+const TINY_SQ_CLASS = "tiny-square";
+
 var winningCombos =[];
 // var player1PotentialWinCombos[];
 // var player2PotentialWinCombos[];
@@ -51,16 +54,26 @@ function run(){
 }
 
 function setupBoard(initial){
+  var squareClass = DEFAULT_SQ_CLASS;
   var gameRowsHTML = "";
   var winningCombo = [];
-  boxSize = parseInt(prompt("Please enter number of rows"));
+  boxSize = 0;
 
+  while ((boxSize == 0) || (boxSize > 13)) {
+    boxSize = parseInt(prompt("Please enter number of rows (<=13)"))
+  };
+
+  if (boxSize > 12) {
+    squareClass = TINY_SQ_CLASS;
+  } else if (boxSize > 6) {
+    squareClass = SMALL_SQ_CLASS;
+  };
 
   for (let rows = 0; rows < boxSize; rows++ ){
     gameRowsHTML += '<div class="board-row">';  // opening for each row
     winningCombo = [];
     for (let columns = 0; columns < boxSize; columns++){
-      gameRowsHTML += `<button id="${rows}${columns}" class="btn-lg ${DEFAULT_SQ_CLASS}">${OPEN_SQUARE}</button>`;
+      gameRowsHTML += `<button id="${rows}${columns}" class="btn-lg ${squareClass}">${OPEN_SQUARE}</button>`;
       winningCombo.push(`${rows}${columns}`);
     } // end columns
     gameRowsHTML += '</div>'  // closing div for the gameRow
@@ -101,7 +114,7 @@ function setupBoard(initial){
   player2.potentialWinCombos = winningCombos.slice(0,winningCombos.length);
 
 // array of boxSize*boxSize objects, each object is a representation of the button object.
-  squares = $(`.${DEFAULT_SQ_CLASS}`);
+  squares = $(`.${squareClass}`);
 
   for (let i = 0; i < squares.length; i++){
     // we can dynamically add an event listener to each...keeps it out of the HTML
@@ -127,32 +140,11 @@ function setupBoard(initial){
   }
 } //end setupBoard
 
-function handleSpinner(spinner){
-  var oldValue = spinner.closest('.number-spinner').find('input').val().trim(), newVal = 0;
-
-  if (spinner.attr('data-dir') == 'up'){
-    newVal = parseInt(oldValue) + 1;
-  } else {
-    if (oldValue > 1) {
-      newVal = parseInt(oldValue) - 1;
-    } else {
-      newVal = 1;
-    }
-  }
-  spinner.closest('.number-spinner').find('input').val(newVal);
-}
-
-
 function resetGame(resetClicked){
 
   // Clear out the buttons in the DOM
   $('#board').html("");
 
-  // original
-  // for (let i = 0; i < squares.length; i++){
-  //   squares[i].innerHTML = OPEN_SQUARE;  // wipe board, set to dash
-  //   squares[i].className = DEFAULT_SQ_CLASS;
-  // }
   // Clear any messages too!
   $('#message').html("");
 
